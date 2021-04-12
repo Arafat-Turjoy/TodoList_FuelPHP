@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<style>
+.alert {
+    padding: 20px;
+    color: white;
+    opacity: 1;
+    transition: opacity 0.6s;
+    margin-bottom: 15px;
+}
+
+.alert.success {background-color: #4CAF50;}
+
+.alert.warning {background-color: #ff9800;}
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.closebtn:hover {
+  color: black;
+}
+
+.btn{
+    cursor: pointer;
+}
+#category{
+    cursor: pointer;
+}
+
+#status{
+    cursor: pointer;
+}
+
+
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script>
+data = {};
+function fun() {
+    var id = document.getElementById('id').value;
+    var category = document.getElementById('category').value;
+    var title = document.getElementById('title').value;
+    var status = document.getElementById('status').checked?1:0;
+    // console.log(status);
+    data = {
+        
+        "category":category,
+        "title": title,
+        "status": status,
+       
+       
+    };
+
+    $.ajax({
+        url:"/test/edit/"+id,
+        method:"POST",
+        data:data,
+    
+         success:function(event) {
+             
+             if(event[0]==true){
+            
+                document.getElementById("notification").innerHTML +='<div class="alert success">'+
+            '<span class="closebtn">&times;</span>  '+
+            '<strong>Value Updated Successfully</strong>'+
+            '</div>';
+             }
+             
+            else{
+                 
+                    
+                document.getElementById("notification").innerHTML = "";
+
+                    for(key in event[1]){
+                        document.getElementById("notification").innerHTML +='<div class="alert warning">'+
+                    '<span class="closebtn">&times;</span>  '+
+                    `<strong>${event[1][key]}</strong>`+
+                    '</div>';
+
+                    }
+    
+            }
+
+            var close = document.getElementsByClassName("closebtn");
+            var i;
+
+            for (i = 0; i < close.length; i++) {
+                close[i].onclick = function(){
+                    var div = this.parentElement;
+                    div.style.opacity = "0";
+                    setTimeout(function(){ div.style.display = "none"; }, 600);
+                   
+                }
+            }
+
+            
+                
+        
+        },
+   
+        error:function(errormessage){
+        alert(errormessage.responseText);
+       
+        }
+    });
+
+
+
+ };
+ 
+ 
+   </script>
+</head>
+<body>
+    
+<form  name ="myForm" method="POST" >
+
+    <div id="notification"></div>
+
+    <table border="1" >
+        
+    <tr>
+    <th>Select Category:</th>
+    <td>
+        <select name="category" id="category" >
+
+            <option value="Reading" <?php echo $project->category==="Reading" ? "selected" : "";?>>Reading</option>
+    <option value="Playing" <?php echo $project->category==="Playing" ? "selected" : "";?>>Playing</option>
+    <option value="Eating" <?php echo $project->category==="Eating" ? "selected" : "";?>>Eating</option>
+    <option value="Drinking" <?php echo $project->category==="Drinking" ? "selected" : "";?>>Drinking</option>
+    <option value="Working" <?php echo $project->category==="Working" ? "selected" : "";?>>Working</option>
+        
+        </select>
+
+    </td>
+    </tr>
+    <tr>
+        
+        <th>Title:</th>
+        <td>
+            <input type="text" name="title" id="title" value="<?php echo $project->title; ?>" >
+        </td>
+
+
+    </tr>
+
+    <tr>
+        <th>Status: </th>
+        
+            
+            <td>
+                Completed:
+
+            <input name="status" type="radio" id="status" value="1"<?php echo ($project->status==1)?'checked':''; ?> >
+                
+                Pending:
+
+            <input name="status" type="radio" id="status" value="0"<?php echo ($project->status==0)?'checked':''; ?> >
+
+        
+        
+            </td>
+
+        
+    </tr>
+    <input type="hidden" id="id" name="projectid" value="<?php echo $project->id; ?>">
+
+
+
+    </table><br>
+
+    <button type="button" class="btn" id="submit" value="submit" onclick=" fun()">Submit</button>
+
+    <button type="button" class="btn" id="back" value="back" onclick="window.location='/todoform/index';">Go Back</button>
+    
+
+    </form>
+
+
+
+</body>
+
+
+
+</html>

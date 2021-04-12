@@ -1,0 +1,198 @@
+<html>
+    <head>
+    <title>Javascript Crud</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <style>
+        table 
+        {
+            width: 100%;
+            font: 17px Calibri;
+        }
+        table, th, td 
+        {
+            border: solid 1px #DDD;
+            border-collapse: collapse;
+            padding: 2px 3px;
+            text-align: center;
+        }
+
+    .alert {
+padding: 20px;
+color: white;
+opacity: 1;
+transition: opacity 0.6s;
+margin-bottom: 15px;
+}
+
+.alert.success {background-color: #4CAF50;}
+
+.alert.warning {background-color: #ff9800;}
+
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.closebtn:hover {
+  color: black;
+}
+</style>
+</head>
+<body>
+    <div id="notification"></div>
+
+<div id="showData"></div>
+<div align="center" style="margin-top:10px;">
+<a href="/todoform/add" >Add Information</a>
+</div>
+
+
+</body>
+
+    <script type="text/javascript">
+$(document).ready(function(){
+
+ fetch_data();
+
+ function fetch_data()
+ {
+  $.ajax({
+   url:"/test/index",
+   success:function(data)
+   {
+    // console.log(data);
+    var arrItems = [];   
+    
+    var key = "Actions";
+    var productid = [];
+    
+    
+    $.each(data, function (index, value) {
+                arrItems.push(value);  
+                
+                // console.log(arrItems[0]["id"]);     
+            });
+            for(j in arrItems){
+                productid[j]= arrItems[j]["id"];
+                // console.log(productid[j]);
+            }
+            // console.log(productid);
+            for (i in arrItems){
+             arrItems[i][key]=`<a class="btn btn-default" href="/todoform/edit/${productid[i]}">Edit</a>
+             <button type="button" name="delete" class="btn btn-danger btn-xs delete" id="${productid[i]}" >Delete</button>`;
+                
+                
+             }
+
+         
+
+         
+
+            
+            var col = [];
+    for (var i = 0; i < arrItems.length; i++) {
+         for (var key in arrItems[i]) {
+            if (col.indexOf(key) === -1) {
+                 col.push(key);
+                }
+            }
+        }
+        
+
+    var table = document.createElement("table");
+    var tr = table.insertRow(-1);    
+
+    for (var i = 1; i < col.length; i++) {
+        var th = document.createElement("th");      
+        th.innerHTML = col[i];
+        
+        tr.appendChild(th);
+        
+        
+         }
+        
+
+    for (var i = 0; i < arrItems.length; i++) {
+
+        if(arrItems[i]["status"]==1){
+                arrItems[i]["status"]="completed";
+            }else{
+                arrItems[i]["status"]="pending";
+            }
+
+        tr = table.insertRow(-1);
+       
+
+        for (var j = 1; j < col.length; j++) {
+            var tabCell = tr.insertCell(-1);
+            
+            
+            tabCell.innerHTML = arrItems[i][col[j]];
+            
+            
+        }
+    }
+
+    var divContainer = document.getElementById("showData");
+    divContainer.innerHTML = "";
+    divContainer.appendChild(table);
+
+   }
+  })
+ }
+
+ $(document).on('click', '.delete', function(){
+    var id = $(this).attr("id");
+//   console.log(id);
+  var action = 'delete';
+ 
+   $.ajax({
+    url:"/test/delete/"+id,
+    method:"POST",
+    
+    success:function(data)
+    {
+        
+    document.getElementById("notification").innerHTML +='<div class="alert success">'+
+        '<span class="closebtn">&times;</span>  '+
+        '<strong>Record has been deleted successfully</strong>'+
+        '</div>';
+         var close = document.getElementsByClassName("closebtn");
+            var i;
+
+            for (i = 0; i < close.length; i++) {
+            close[i].onclick = function(){
+                var div = this.parentElement;
+                div.style.opacity = "0";
+                setTimeout(function(){ div.style.display = "none"; }, 600);
+            }
+            }
+
+        $("#"+id).parents("tr").remove();
+    //  fetch_data();
+     
+    },
+   });
+  
+ });
+
+
+ 
+
+
+
+ 
+
+});
+ 
+</script>
+</html>
+
